@@ -1,0 +1,92 @@
+/*
+  Cores e medidas da identidade visual Beach Bike Store.
+
+  Cores tiradas da logo: amarelo #FCBB18, azul #0BA8EC, preto e branco.
+  Regra de uso:
+    - Amarelo: ação principal e meta. Usado pouco, para chamar atenção.
+    - Azul: tudo que vem de "tecnologia" — Assistente IA, Sankhya, sincronização.
+    - Vermelho: só para alerta (atrasado, parado há dias).
+
+  O tema escuro é o padrão. O tema claro é ativado por data-tema="claro" no <html>.
+  As telas usam SEMPRE estas variáveis, nunca cores soltas.
+*/
+
+:root {
+  /* Marca (iguais nos dois temas) */
+  --marca-amarelo: #fcbb18;
+  --marca-amarelo-forte: #ffcb3d;
+  --marca-azul: #0ba8ec;
+  --marca-preto: #000200;
+  --texto-sobre-amarelo: #1a1300;
+
+  /* Tema escuro (padrão) */
+  --fundo: #0a0a0b;
+  --superficie: #121214;
+  --superficie-2: #18181b;
+  --superficie-3: #202024;
+  --borda: rgba(255, 255, 255, 0.07);
+  --borda-forte: rgba(255, 255, 255, 0.14);
+  --texto: #f4f4f5;
+  --texto-2: #a1a1aa;
+  --texto-3: #6e6e78;
+  --destaque: var(--marca-amarelo);
+  --destaque-texto: #fcbb18;
+  --destaque-suave: rgba(252, 187, 24, 0.12);
+  --tecnologia: var(--marca-azul);
+  --tecnologia-texto: #5cc8f5;
+  --tecnologia-suave: rgba(11, 168, 236, 0.13);
+  --tecnologia-borda: rgba(11, 168, 236, 0.45);
+  --alerta: #f26b6b;
+  --alerta-suave: rgba(242, 107, 107, 0.13);
+  --sucesso: #3ecf8e;
+  --sucesso-suave: rgba(62, 207, 142, 0.13);
+  --pontos-do-fundo: rgba(255, 255, 255, 0.035);
+  --sombra: 0 12px 40px rgba(0, 0, 0, 0.55);
+  --veu: rgba(0, 0, 0, 0.6);
+
+  /* Barra lateral: sempre escura, como o fundo da logo */
+  --lateral-fundo: #000200;
+  --lateral-texto: #a1a1aa;
+  --lateral-ativo: #ffffff;
+  --lateral-borda: rgba(255, 255, 255, 0.08);
+
+  /* Tipografia */
+  --fonte-texto: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --fonte-titulo: 'Space Grotesk', 'Inter', system-ui, sans-serif;
+  --fonte-numero: 'JetBrains Mono', ui-monospace, 'Cascadia Mono', monospace;
+
+  /* Medidas */
+  --raio: 10px;
+  --raio-grande: 14px;
+  --raio-pilula: 999px;
+  --duracao: 160ms;
+
+  color-scheme: dark;
+}
+
+:root[data-tema='claro'] {
+  --fundo: #f4f4f2;
+  --superficie: #ffffff;
+  --superficie-2: #fafaf9;
+  --superficie-3: #efefec;
+  --borda: rgba(0, 0, 0, 0.08);
+  --borda-forte: rgba(0, 0, 0, 0.16);
+  --texto: #111113;
+  --texto-2: #52525b;
+  --texto-3: #8a8a93;
+  /* No fundo branco, amarelo e azul escurecem para continuar legíveis como texto */
+  --destaque-texto: #946600;
+  --destaque-suave: rgba(252, 187, 24, 0.18);
+  --tecnologia-texto: #0473a6;
+  --tecnologia-suave: rgba(11, 168, 236, 0.1);
+  --tecnologia-borda: rgba(11, 168, 236, 0.5);
+  --alerta: #d23c3c;
+  --alerta-suave: rgba(210, 60, 60, 0.09);
+  --sucesso: #138a57;
+  --sucesso-suave: rgba(19, 138, 87, 0.1);
+  --pontos-do-fundo: rgba(0, 0, 0, 0.045);
+  --sombra: 0 12px 40px rgba(0, 0, 0, 0.14);
+  --veu: rgba(10, 10, 11, 0.35);
+
+  color-scheme: light;
+}

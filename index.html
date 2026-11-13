@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="pt-BR" class="iniciando">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Mesa do vendedor · Beach Bike CRM</title>
+    <meta name="description" content="Protótipo do CRM da Beach Bike Store — tela de trabalho dos vendedores, com dados de demonstração." />
+    <link rel="icon" href="assets/icone.svg" type="image/svg+xml" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600&display=swap"
+    />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.49.0/dist/tabler-icons.min.css" />
+
+    <link rel="stylesheet" href="css/tokens.css" />
+    <link rel="stylesheet" href="css/base.css" />
+    <link rel="stylesheet" href="css/componentes.css" />
+    <link rel="stylesheet" href="css/vendedor.css" />
+  </head>
+  <body>
+    <div class="aplicacao">
+      <aside class="lateral">
+        <div class="lateral-logo">
+          <img src="assets/logo-beach-bike.png" alt="Beach Bike Store" />
+          <span class="selo-crm">CRM</span>
+        </div>
+
+        <nav class="lateral-menu" aria-label="Menu principal">
+          <a class="item-menu ativo" href="#" aria-current="page"><i class="ti ti-layout-dashboard" aria-hidden="true"></i>Minha mesa</a>
+          <span class="item-menu em-breve" title="Próximas telas do protótipo"><i class="ti ti-users" aria-hidden="true"></i>Clientes</span>
+          <span class="item-menu em-breve" title="Próximas telas do protótipo"><i class="ti ti-message-chatbot" aria-hidden="true"></i>Atendimentos IA</span>
+          <span class="item-menu em-breve" title="Próximas telas do protótipo"><i class="ti ti-calendar" aria-hidden="true"></i>Agenda</span>
+          <span class="item-menu em-breve" title="Próximas telas do protótipo"><i class="ti ti-tool" aria-hidden="true"></i>Oficina</span>
+        </nav>
+
+        <section id="ferramentas-demo" class="ferramentas-demo" aria-label="Ferramentas da demonstração"></section>
+      </aside>
+
+      <main class="mesa">
+        <header class="topo">
+          <div id="saudacao" class="saudacao"></div>
+
+          <div class="busca" role="search">
+            <i class="ti ti-search" aria-hidden="true"></i>
+            <input id="campo-busca" type="search" placeholder="Buscar cliente por nome ou telefone" autocomplete="off" aria-label="Buscar cliente" />
+            <div id="resultados-busca" class="resultados-busca" hidden></div>
+          </div>
+
+          <div id="sincronizacao" class="sincronizacao"></div>
+          <button id="botao-tema" class="botao botao-fantasma botao-icone" type="button"></button>
+          <button id="botao-novo-atendimento" class="botao botao-principal" type="button">
+            <i class="ti ti-plus" aria-hidden="true"></i>Novo atendimento
+          </button>
+          <div id="usuario" class="usuario"></div>
+        </header>
+
+        <section id="faixa-da-vez" class="faixa-da-vez cartao" aria-label="Lista da vez"></section>
+        <section id="indicadores" class="indicadores" aria-label="Indicadores do mês"></section>
+
+        <div class="area-de-trabalho">
+          <section id="meu-dia" class="meu-dia cartao" aria-label="Meu dia"></section>
+          <section id="funil" class="funil" aria-label="Meu funil"></section>
+        </div>
+      </main>
+    </div>
+
+    <div id="area-de-avisos" class="area-de-avisos" aria-live="polite"></div>
+
+    <script type="module" src="js/telas/vendedor.js"></script>
+  </body>
+</html>

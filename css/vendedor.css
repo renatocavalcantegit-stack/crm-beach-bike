@@ -1,0 +1,761 @@
+/* Layout da tela do vendedor ("Minha mesa"). Feita para computador (a partir de 1280px). */
+
+/* Esconde a tela até o JavaScript aplicar o tema escolhido (evita piscar). */
+html.iniciando body {
+  opacity: 0;
+}
+
+body {
+  transition: opacity 200ms ease-out;
+}
+
+.aplicacao {
+  display: grid;
+  grid-template-columns: 236px minmax(0, 1fr);
+  min-height: 100vh;
+  min-width: 1180px;
+}
+
+/* ---------- Barra lateral ---------- */
+.lateral {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 20px 14px;
+  background: var(--lateral-fundo);
+  border-right: 1px solid var(--lateral-borda);
+  color: var(--lateral-texto);
+}
+
+.lateral-logo {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  padding: 0 6px;
+}
+
+.lateral-logo img {
+  width: 100%;
+  max-width: 190px;
+  height: auto;
+}
+
+.selo-crm {
+  font-family: var(--fonte-numero);
+  font-size: 10px;
+  letter-spacing: 0.3em;
+  color: var(--marca-azul);
+  padding-left: 2px;
+}
+
+.lateral-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.item-menu {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 10px;
+  border-radius: var(--raio);
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 13px;
+}
+
+.item-menu .ti {
+  font-size: 18px;
+}
+
+.item-menu.ativo {
+  color: var(--lateral-ativo);
+  background: rgba(255, 255, 255, 0.07);
+  box-shadow: inset 2px 0 0 var(--marca-amarelo);
+}
+
+.item-menu.em-breve {
+  opacity: 0.45;
+  cursor: default;
+}
+
+/* Caixa de ferramentas da demonstração (some quando existir login de verdade) */
+.ferramentas-demo {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px 12px;
+  border-radius: var(--raio-grande);
+  border: 1px dashed rgba(11, 168, 236, 0.4);
+  background: rgba(11, 168, 236, 0.06);
+  color: #d4d4d8;
+}
+
+.ferramentas-demo .titulo-secao {
+  color: #5cc8f5;
+}
+
+.ferramentas-demo .campo label {
+  color: #a1a1aa;
+}
+
+.ferramentas-demo select {
+  background: #111113;
+  border-color: rgba(255, 255, 255, 0.14);
+  color: #f4f4f5;
+}
+
+.ferramentas-demo .botao {
+  width: 100%;
+  background: #18181b;
+  border-color: rgba(255, 255, 255, 0.12);
+  color: #f4f4f5;
+}
+
+.ferramentas-demo .botao:hover {
+  background: #26262b;
+}
+
+/* ---------- Área principal ---------- */
+.mesa {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 18px 24px 28px;
+  /* Pontilhado discreto ao fundo: passa a sensação de "painel técnico" */
+  background-image: radial-gradient(var(--pontos-do-fundo) 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+
+/* ---------- Topo ---------- */
+.topo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.saudacao {
+  margin-right: auto;
+}
+
+.saudacao h1 {
+  font-size: 22px;
+}
+
+.saudacao p {
+  font-size: 12px;
+  color: var(--texto-3);
+}
+
+.busca {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 340px;
+  height: 36px;
+  padding: 0 12px;
+  border-radius: var(--raio);
+  border: 1px solid var(--borda-forte);
+  background: var(--superficie);
+  color: var(--texto-3);
+}
+
+.busca:focus-within {
+  border-color: var(--marca-azul);
+  box-shadow: 0 0 0 3px var(--tecnologia-suave);
+}
+
+.busca input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  outline: none;
+  background: transparent;
+  color: var(--texto);
+}
+
+.resultados-busca {
+  position: absolute;
+  z-index: 30;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  padding: 6px;
+  border-radius: var(--raio);
+  border: 1px solid var(--borda-forte);
+  background: var(--superficie);
+  box-shadow: var(--sombra);
+}
+
+.resultado-busca {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 8px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  text-align: left;
+  color: var(--texto);
+}
+
+.resultado-busca:hover,
+.resultado-busca:focus-visible {
+  background: var(--superficie-3);
+}
+
+.resultado-busca small {
+  display: block;
+  color: var(--texto-3);
+}
+
+.sincronizacao {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 36px;
+  padding: 0 12px;
+  border-radius: var(--raio);
+  border: 1px solid var(--tecnologia-borda);
+  background: var(--tecnologia-suave);
+  font-size: 12px;
+  color: var(--tecnologia-texto);
+  white-space: nowrap;
+}
+
+.usuario {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-left: 4px;
+}
+
+/* ---------- Faixa da vez ---------- */
+.faixa-da-vez {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  padding: 14px 18px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Linha amarela à esquerda: é a informação mais importante do dia do vendedor */
+.faixa-da-vez::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--marca-amarelo);
+}
+
+.minha-vez {
+  min-width: 210px;
+}
+
+.minha-vez .rotulo {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--texto-3);
+}
+
+.minha-vez .situacao {
+  font-family: var(--fonte-titulo);
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.minha-vez .situacao .numero {
+  color: var(--destaque-texto);
+}
+
+.fila {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+  min-width: 0;
+  overflow-x: auto;
+}
+
+.pessoa-na-fila {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 12px 5px 5px;
+  border-radius: var(--raio-pilula);
+  border: 1px solid var(--borda);
+  background: var(--superficie-2);
+  white-space: nowrap;
+}
+
+.pessoa-na-fila .posicao {
+  font-family: var(--fonte-numero);
+  font-size: 11px;
+  color: var(--texto-3);
+}
+
+.pessoa-na-fila.e-a-vez {
+  border-color: var(--marca-amarelo);
+  background: var(--destaque-suave);
+}
+
+.pessoa-na-fila.sou-eu .nome {
+  font-weight: 600;
+}
+
+.pessoa-na-fila.pausa,
+.pessoa-na-fila.ausente {
+  opacity: 0.55;
+}
+
+.pessoa-na-fila .avatar {
+  width: 26px;
+  height: 26px;
+  font-size: 10px;
+}
+
+.seta-da-fila {
+  color: var(--texto-3);
+  font-size: 14px;
+}
+
+/* ---------- Indicadores ---------- */
+.indicadores {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.indicador {
+  padding: 14px 16px;
+}
+
+.indicador .rotulo {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--texto-2);
+}
+
+.indicador .rotulo .ti {
+  font-size: 16px;
+  color: var(--texto-3);
+}
+
+.indicador .valor {
+  margin-top: 6px;
+  font-size: 26px;
+  font-weight: 500;
+}
+
+.indicador .detalhe {
+  margin-top: 4px;
+  font-size: 12px;
+  color: var(--texto-3);
+}
+
+.indicador .detalhe.alerta {
+  color: var(--alerta);
+}
+
+.barra-da-meta {
+  height: 5px;
+  margin-top: 10px;
+  border-radius: var(--raio-pilula);
+  background: var(--superficie-3);
+  overflow: hidden;
+}
+
+.barra-da-meta span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--marca-amarelo);
+  transition: width 500ms ease-out;
+}
+
+.indicador-tecnologia .rotulo .ti,
+.indicador-tecnologia .valor {
+  color: var(--tecnologia-texto);
+}
+
+/* ---------- Área de trabalho: Meu dia + Funil ---------- */
+.area-de-trabalho {
+  display: grid;
+  grid-template-columns: 310px minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
+}
+
+.meu-dia {
+  padding: 16px;
+  position: sticky;
+  top: 18px;
+}
+
+.meu-dia .titulo-secao {
+  margin-bottom: 12px;
+}
+
+.lista-meu-dia {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.item-do-dia {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: var(--raio);
+  border: 1px solid var(--borda);
+  background: var(--superficie-2);
+  text-align: left;
+  transition: border-color var(--duracao), background-color var(--duracao);
+}
+
+.item-do-dia:hover {
+  border-color: var(--borda-forte);
+  background: var(--superficie-3);
+}
+
+.item-do-dia .cabecalho-do-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.item-do-dia .cliente {
+  font-weight: 600;
+}
+
+.item-do-dia .texto {
+  font-size: 12px;
+  color: var(--texto-2);
+}
+
+.item-do-dia.ia {
+  border-color: var(--tecnologia-borda);
+  background: var(--tecnologia-suave);
+}
+
+.dia-vazio {
+  padding: 18px 8px;
+  text-align: center;
+  color: var(--texto-3);
+  font-size: 13px;
+}
+
+.dia-vazio .ti {
+  display: block;
+  font-size: 28px;
+  margin-bottom: 6px;
+  color: var(--sucesso);
+}
+
+/* ---------- Funil (quadro de colunas) ---------- */
+.funil {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.cabecalho-do-funil {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.cabecalho-do-funil .dica {
+  font-size: 12px;
+  color: var(--texto-3);
+}
+
+.colunas {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.coluna {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 420px;
+  padding: 10px;
+  border-radius: var(--raio-grande);
+  border: 1px solid var(--borda);
+  background: color-mix(in srgb, var(--superficie) 70%, transparent);
+  transition: border-color var(--duracao), background-color var(--duracao);
+}
+
+.coluna.recebendo {
+  border-color: var(--marca-amarelo);
+  background: var(--destaque-suave);
+}
+
+.cabecalho-da-coluna {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 2px 4px 6px;
+  border-bottom: 1px solid var(--borda);
+}
+
+.cabecalho-da-coluna h3 {
+  font-size: 14px;
+}
+
+.cabecalho-da-coluna .quantidade {
+  margin-left: 6px;
+  font-family: var(--fonte-numero);
+  font-size: 12px;
+  color: var(--texto-3);
+}
+
+.cabecalho-da-coluna .total {
+  font-size: 12px;
+  color: var(--texto-2);
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 11px 12px;
+  border-radius: var(--raio);
+  border: 1px solid var(--borda);
+  background: var(--superficie-2);
+  cursor: grab;
+  text-align: left;
+  transition: border-color var(--duracao), transform var(--duracao), background-color var(--duracao);
+}
+
+.card:hover {
+  border-color: var(--borda-forte);
+  background: var(--superficie-3);
+  transform: translateY(-1px);
+}
+
+.card.arrastando {
+  opacity: 0.4;
+}
+
+.card.da-ia {
+  border-color: var(--tecnologia-borda);
+}
+
+.card.parado {
+  border-color: color-mix(in srgb, var(--alerta) 45%, transparent);
+}
+
+.card .nome {
+  font-weight: 600;
+}
+
+.card .interesse {
+  font-size: 12px;
+  color: var(--texto-2);
+}
+
+.card .valor-do-card {
+  font-size: 13px;
+}
+
+.card .rodape-do-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  margin-top: 2px;
+}
+
+.card .origem {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: var(--texto-3);
+}
+
+.card .origem .ti {
+  font-size: 15px;
+}
+
+.coluna-vazia {
+  padding: 16px 6px;
+  text-align: center;
+  font-size: 12px;
+  color: var(--texto-3);
+  border: 1px dashed var(--borda-forte);
+  border-radius: var(--raio);
+}
+
+/* ---------- Painel do cliente (gaveta) ---------- */
+.painel-cliente {
+  display: flex;
+  flex-direction: column;
+}
+
+.painel-cabecalho {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  padding: 22px 22px 16px;
+  border-bottom: 1px solid var(--borda);
+}
+
+.painel-cabecalho h2 {
+  font-size: 20px;
+}
+
+.painel-cabecalho .dados-basicos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  margin-top: 4px;
+  font-size: 12px;
+  color: var(--texto-2);
+}
+
+.painel-cabecalho .fechar {
+  margin-left: auto;
+}
+
+.painel-secao .titulo-secao .texto-fraco {
+  text-transform: none;
+  letter-spacing: 0;
+  font-weight: 400;
+}
+
+.painel-secao {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px 22px;
+  border-bottom: 1px solid var(--borda);
+}
+
+.oportunidade-atual {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.oportunidade-atual .dado small {
+  display: block;
+  font-size: 11px;
+  color: var(--texto-3);
+}
+
+.oportunidade-atual .dado strong {
+  font-weight: 500;
+}
+
+.acoes-do-painel {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.acoes-do-painel .botao {
+  width: 100%;
+}
+
+.resumo-ia {
+  padding: 12px 14px;
+  border-radius: var(--raio);
+  border: 1px solid var(--tecnologia-borda);
+  background: var(--tecnologia-suave);
+  font-size: 13px;
+}
+
+.resumo-ia .titulo-secao {
+  color: var(--tecnologia-texto);
+  margin-bottom: 6px;
+}
+
+.lista-simples {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.linha-simples {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 9px 12px;
+  border-radius: var(--raio);
+  background: var(--superficie-2);
+  font-size: 13px;
+}
+
+.linha-simples small {
+  display: block;
+  color: var(--texto-3);
+  font-size: 11px;
+}
+
+.linha-do-tempo {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin-left: 6px;
+  border-left: 1px solid var(--borda-forte);
+}
+
+.evento {
+  position: relative;
+  padding: 0 0 14px 16px;
+  font-size: 13px;
+}
+
+.evento::before {
+  content: '';
+  position: absolute;
+  left: -4px;
+  top: 6px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--texto-3);
+}
+
+.evento.ia::before,
+.evento.sankhya::before {
+  background: var(--marca-azul);
+}
+
+.evento.fechamento::before {
+  background: var(--marca-amarelo);
+}
+
+.evento small {
+  display: block;
+  color: var(--texto-3);
+  font-size: 11px;
+}
+
+.oportunidade-fechada {
+  padding: 10px 12px;
+  border-radius: var(--raio);
+  background: var(--superficie-2);
+  font-size: 13px;
+}
