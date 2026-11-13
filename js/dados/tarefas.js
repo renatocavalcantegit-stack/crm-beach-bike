@@ -25,3 +25,15 @@ export async function concluirTarefasDaOportunidade(idOportunidade) {
   );
   gravar('tarefas', tarefas);
 }
+
+/**
+ * Mensagem enviada pelo chat: dá como feitos os retornos daquela oportunidade
+ * marcados até o fim de hoje. Retornos de outros dias continuam valendo.
+ */
+export async function concluirRetornosAteHoje(idOportunidade, agora = new Date()) {
+  const fimDeHoje = new Date(agora.getFullYear(), agora.getMonth(), agora.getDate() + 1);
+  const tarefas = ler('tarefas', []).map((tarefa) =>
+    tarefa.idOportunidade === idOportunidade && new Date(tarefa.dataHora) < fimDeHoje ? { ...tarefa, concluida: true } : tarefa,
+  );
+  gravar('tarefas', tarefas);
+}

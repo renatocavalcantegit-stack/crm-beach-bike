@@ -5,12 +5,14 @@
 // js/regras/distribuicao.js; aqui juntamos os passos e gravamos.
 
 import { decidirResponsavel, explicarMotivo } from '../regras/distribuicao.js';
+import { canalDaOrigem } from '../regras/conversas.js';
 import { ORIGENS } from '../regras/funil.js';
 import { buscarCliente, buscarClientePorTelefone, criarCliente } from './clientes.js';
 import { obterConfiguracaoDaDistribuicao, obterFilaDoDia, passarAVez } from './fila.js';
 import { registrarInteracao } from './interacoes.js';
 import { criarOportunidade, listarOportunidades, registrarNovaTransferenciaDaIa } from './oportunidades.js';
-import { criarTarefa } from './tarefas.js';
+import { registrarMensagemRecebida } from './conversas.js';
+import { buscarVendedor } from './vendedores.js';
 
 /** Encontra o cliente pelo id ou telefone; se não existir, cadastra. */
 async function obterOuCriarCliente({ idClienteExistente, nome, telefone, bairro }) {
@@ -19,26 +21,29 @@ async function obterOuCriarCliente({ idClienteExistente, nome, telefone, bairro 
 }
 
 /**
- * Cliente que já tinha atendimento aberto voltou a chamar: em vez de duplicar
- * a oportunidade, avisamos o vendedor com um retorno para daqui a 15 minutos.
+ * Grava a conversa que trouxe o contato. Balcão não tem conversa.
+ * contato.conversa: [{ autor: 'cliente' | 'ia', texto }] — a IA já conversou antes de transferir.
+ * Sem "conversa", a mensagem do cliente é o próprio interesse.
  */
-async function avisarSobreAtendimentoAberto(aberta, contato) {
+async function gravarConversaDoContato(idCliente, contato, idVendedor) {
+  const canal = canalDaOrigem(contato.origem);
+  if (!canal) return;
+
+  const falas = contato.conversa ?? [{ autor: 'cliente', texto: contato.interesse }];
+  // As falas chegam com alguns segundos de diferença, na ordem certa.
+  const inicio = Date.now() - falas.length * 20000;
+  falas.forEach((fala, posicao) =>
+    registrarMensagemRecebida({ idCliente, canal, autor: fala.autor, texto: fala.texto, enviadaEm: new Date(inicio + posicao * 20000).toISOString() }),
+  );
   if (contato.origem === 'ia') {
-    await registrarNovaTransferenciaDaIa(aberta.id, { resumoIa: contato.resumoIa, valor: contato.valor });
-    return;
+    const vendedor = await buscarVendedor(idVendedor);
+    registrarMensagemRecebida({ idCliente, canal, autor: 'sistema', texto: `Assistente IA transferiu o atendimento para ${vendedor.nome}` });
   }
-  await criarTarefa({
-    idOportunidade: aberta.id,
-    idCliente: aberta.idCliente,
-    idVendedor: aberta.idVendedor,
-    descricao: `Responder: ${contato.interesse}`,
-    dataHora: new Date(Date.now() + 15 * 60000).toISOString(),
-  });
 }
 
 /**
  * Recebe um contato e devolve { cliente, oportunidade, decisao }.
- * contato: { origem, interesse, nome?, telefone?, bairro?, idClienteExistente?, valor?, resumoIa? }
+ * contato: { origem, interesse, nome?, telefone?, bairro?, idClienteExistente?, valor?, resumoIa?, conversa? }
  * idVendedorDoBalcao: quem clicou em "Novo atendimento" (cliente na loja).
  */
 export async function receberContato(contato, idVendedorDoBalcao = null) {
@@ -57,7 +62,9 @@ export async function receberContato(contato, idVendedorDoBalcao = null) {
 
   if (decisao.motivo === 'oportunidade_aberta') {
     const aberta = oportunidades.find((o) => o.idCliente === cliente.id && o.idVendedor === decisao.idVendedor && !['ganho', 'perdido'].includes(o.etapa));
-    await avisarSobreAtendimentoAberto(aberta, contato);
+    // Não duplica a oportunidade: a mensagem nova aparece no chat e no "Meu dia".
+    if (contato.origem === 'ia') await registrarNovaTransferenciaDaIa(aberta.id, { resumoIa: contato.resumoIa, valor: contato.valor });
+    await gravarConversaDoContato(cliente.id, contato, decisao.idVendedor);
     await registrarInteracao({ idCliente: cliente.id, idVendedor: decisao.idVendedor, tipo: 'distribuicao',
       descricao: `Voltou a chamar pelo ${ORIGENS[contato.origem]}: ${contato.interesse}` });
     return { cliente, oportunidade: aberta, decisao };
@@ -76,6 +83,7 @@ export async function receberContato(contato, idVendedorDoBalcao = null) {
     transferenciaVista: !veioDaIa,
   });
 
+  await gravarConversaDoContato(cliente.id, contato, decisao.idVendedor);
   if (decisao.contaComoVez) await passarAVez(decisao.idVendedor);
   await registrarInteracao({ idCliente: cliente.id, idVendedor: decisao.idVendedor, tipo: veioDaIa ? 'ia' : 'distribuicao',
     descricao: `Contato pelo ${ORIGENS[contato.origem]} — ${explicarMotivo(decisao.motivo)}` });

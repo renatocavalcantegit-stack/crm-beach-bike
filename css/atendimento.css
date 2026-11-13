@@ -1,0 +1,436 @@
+/*
+  Tela de atendimento (conversa do WhatsApp/Instagram dentro do CRM).
+  Abre como gaveta larga por cima da mesa do vendedor.
+
+  Cores dos balões seguem a regra da marca:
+    - cliente: superfície neutra;
+    - vendedor: amarelo suave (é a loja falando, ação principal);
+    - Assistente IA: azul suave (tecnologia);
+    - avisos do sistema: pílula centralizada.
+*/
+
+/* ---------- Gaveta larga ---------- */
+.gaveta.gaveta-larga {
+  width: min(1240px, calc(100vw - 72px));
+  overflow: hidden;
+}
+
+.atendimento {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.atendimento > .carregando {
+  padding: 24px;
+}
+
+/* ---------- Cabeçalho ---------- */
+.cabecalho-do-atendimento {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 18px 22px 16px;
+  border-bottom: 1px solid var(--borda);
+}
+
+.linha-do-cliente {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.linha-do-cliente .identificacao {
+  flex: 1;
+  min-width: 0;
+}
+
+.linha-do-cliente h2 {
+  font-size: 20px;
+}
+
+.cabecalho-do-atendimento .dados-basicos {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 12px;
+  margin-top: 4px;
+  font-size: 12px;
+  color: var(--texto-2);
+}
+
+.acoes-do-atendimento {
+  display: flex;
+  gap: 8px;
+}
+
+.resumo-do-atendimento {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: var(--raio);
+  background: var(--superficie-2);
+}
+
+.resumo-do-atendimento .dado small {
+  display: block;
+  margin-bottom: 2px;
+  font-size: 11px;
+  color: var(--texto-3);
+}
+
+.resumo-do-atendimento .dado strong {
+  font-weight: 500;
+}
+
+.seletor-de-etapa {
+  width: 100%;
+  height: 30px;
+  padding: 0 8px;
+  border-radius: 8px;
+  border: 1px solid var(--borda-forte);
+  background: var(--superficie);
+  color: var(--texto);
+  font-weight: 500;
+}
+
+.seletor-de-etapa:focus {
+  outline: 2px solid var(--marca-amarelo);
+  outline-offset: 1px;
+}
+
+/* ---------- Corpo: conversa | lateral ---------- */
+.corpo-do-atendimento {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 360px;
+}
+
+.coluna-da-conversa {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  border-right: 1px solid var(--borda);
+}
+
+.lateral-do-atendimento {
+  overflow-y: auto;
+}
+
+.lateral-do-atendimento .linha-simples.atrasada {
+  border: 1px solid color-mix(in srgb, var(--alerta) 45%, transparent);
+}
+
+/* ---------- Mensagens ---------- */
+.mensagens {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 18px 22px;
+  /* Mesmo pontilhado discreto do fundo da mesa */
+  background-image: radial-gradient(var(--pontos-do-fundo) 1px, transparent 1px);
+  background-size: 18px 18px;
+}
+
+.separador-de-dia {
+  display: flex;
+  justify-content: center;
+  margin: 6px 0;
+}
+
+.separador-de-dia span {
+  padding: 3px 10px;
+  border-radius: var(--raio-pilula);
+  background: var(--superficie-3);
+  font-size: 11px;
+  color: var(--texto-2);
+}
+
+.balao {
+  max-width: min(72%, 560px);
+  padding: 8px 12px 6px;
+  border-radius: 14px;
+  border: 1px solid var(--borda);
+  background: var(--superficie-2);
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.balao-cliente {
+  align-self: flex-start;
+  border-bottom-left-radius: 4px;
+}
+
+.balao-vendedor,
+.balao-ia {
+  align-self: flex-end;
+  border-bottom-right-radius: 4px;
+}
+
+.balao-vendedor {
+  border-color: color-mix(in srgb, var(--marca-amarelo) 35%, transparent);
+  background: var(--destaque-suave);
+}
+
+.balao-ia {
+  border-color: var(--tecnologia-borda);
+  background: var(--tecnologia-suave);
+}
+
+.autor-do-balao {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 2px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--destaque-texto);
+}
+
+.balao-ia .autor-do-balao {
+  color: var(--tecnologia-texto);
+}
+
+.texto-do-balao {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.foto-do-balao {
+  display: block;
+  width: 260px;
+  max-width: 100%;
+  aspect-ratio: 4 / 3; /* reserva o espaço antes de a foto carregar: a rolagem não pula */
+  object-fit: cover;
+  margin: 4px 0;
+  border-radius: 10px;
+}
+
+.rodape-do-balao {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 4px;
+  margin-top: 2px;
+  font-size: 11px;
+  color: var(--texto-3);
+}
+
+.status-da-mensagem .ti {
+  font-size: 14px;
+}
+
+.status-da-mensagem.lida {
+  color: var(--sucesso);
+}
+
+.aviso-da-conversa {
+  align-self: center;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: var(--raio-pilula);
+  border: 1px solid var(--tecnologia-borda);
+  background: var(--tecnologia-suave);
+  font-size: 12px;
+  color: var(--tecnologia-texto);
+}
+
+.conversa-vazia {
+  margin: auto;
+  color: var(--texto-3);
+}
+
+/* Balcão ou conversa de outro vendedor: mensagem no meio da área */
+.conversa-presencial {
+  margin: auto;
+  max-width: 380px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  text-align: center;
+  color: var(--texto-2);
+}
+
+.conversa-presencial > .ti {
+  font-size: 34px;
+  color: var(--texto-3);
+}
+
+.conversa-presencial strong {
+  font-size: 16px;
+  color: var(--texto);
+}
+
+/* ---------- Caixa de escrever ---------- */
+.compositor {
+  border-top: 1px solid var(--borda);
+  background: var(--superficie);
+}
+
+.compositor:empty {
+  display: none;
+}
+
+.faixa-da-janela {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 22px;
+  font-size: 12px;
+  color: var(--texto-2);
+  border-bottom: 1px solid var(--borda);
+}
+
+.faixa-da-janela span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.faixa-da-janela.fechada {
+  color: var(--alerta);
+  background: var(--alerta-suave);
+}
+
+.caixa-de-escrever {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px 22px 16px;
+}
+
+.respostas-rapidas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.chip {
+  height: 26px;
+  padding: 0 10px;
+  border-radius: var(--raio-pilula);
+  border: 1px solid var(--borda-forte);
+  background: var(--superficie-2);
+  color: var(--texto-2);
+  font-size: 12px;
+  cursor: pointer;
+  transition: border-color var(--duracao), color var(--duracao);
+}
+
+.chip:hover {
+  border-color: var(--marca-amarelo);
+  color: var(--texto);
+}
+
+.linha-de-escrever {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.campo-da-mensagem {
+  flex: 1;
+  min-height: 42px;
+  max-height: 160px;
+  padding: 10px 12px;
+  border-radius: var(--raio);
+  border: 1px solid var(--borda-forte);
+  background: var(--superficie-2);
+  color: var(--texto);
+  resize: vertical;
+  font: inherit;
+  font-size: 14px;
+}
+
+.campo-da-mensagem:focus {
+  outline: none;
+  border-color: var(--marca-amarelo);
+}
+
+.linha-de-escrever .botao {
+  height: 42px;
+}
+
+.lista-de-modelos {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 22px 16px;
+  max-height: 260px;
+  overflow-y: auto;
+}
+
+.modelo {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 12px;
+  border-radius: var(--raio);
+  border: 1px solid var(--borda);
+  background: var(--superficie-2);
+  font-size: 13px;
+}
+
+.modelo p {
+  margin-top: 2px;
+  color: var(--texto-2);
+}
+
+.conversa-encerrada {
+  padding: 14px 22px;
+  font-size: 13px;
+  color: var(--texto-3);
+}
+
+/* ---------- Modal de fotos do catálogo ---------- */
+.modal:has(.grade-de-fotos) {
+  width: min(640px, calc(100vw - 32px));
+}
+
+.grade-de-fotos {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.opcao-de-foto {
+  position: relative; /* o rádio escondido fica dentro do cartão, sem criar rolagem */
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 6px;
+  border-radius: var(--raio);
+  border: 1px solid var(--borda);
+  background: var(--superficie-2);
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.opcao-de-foto img {
+  width: 100%;
+  border-radius: 8px;
+}
+
+.opcao-de-foto input {
+  position: absolute;
+  opacity: 0;
+}
+
+.opcao-de-foto:has(input:checked) {
+  border-color: var(--marca-amarelo);
+  background: var(--destaque-suave);
+}
+
+.opcao-de-foto:has(input:focus-visible) {
+  outline: 2px solid var(--marca-amarelo);
+}

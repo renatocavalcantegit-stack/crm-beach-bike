@@ -455,6 +455,10 @@ body {
   background: var(--tecnologia-suave);
 }
 
+.item-do-dia.aguardando {
+  border-color: color-mix(in srgb, var(--marca-amarelo) 40%, transparent);
+}
+
 .dia-vazio {
   padding: 18px 8px;
   text-align: center;
@@ -574,6 +578,44 @@ body {
   color: var(--texto-2);
 }
 
+.card .linha-do-nome {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+/* Mensagens do cliente sem resposta: amarelo, porque responder é a ação principal */
+.card .contador-sem-resposta {
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: var(--raio-pilula);
+  background: var(--marca-amarelo);
+  color: var(--texto-sobre-amarelo);
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 20px;
+  text-align: center;
+}
+
+.card .ultima-mensagem {
+  display: flex;
+  align-items: flex-start;
+  gap: 5px;
+  font-size: 12px;
+  color: var(--texto-3);
+}
+
+.card .ultima-mensagem .ti {
+  margin-top: 1px;
+  font-size: 13px;
+}
+
+.card .ultima-mensagem.do-cliente {
+  color: var(--texto);
+}
+
 .card .valor-do-card {
   font-size: 13px;
 }
@@ -607,37 +649,7 @@ body {
   border-radius: var(--raio);
 }
 
-/* ---------- Painel do cliente (gaveta) ---------- */
-.painel-cliente {
-  display: flex;
-  flex-direction: column;
-}
-
-.painel-cabecalho {
-  display: flex;
-  gap: 14px;
-  align-items: flex-start;
-  padding: 22px 22px 16px;
-  border-bottom: 1px solid var(--borda);
-}
-
-.painel-cabecalho h2 {
-  font-size: 20px;
-}
-
-.painel-cabecalho .dados-basicos {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px 12px;
-  margin-top: 4px;
-  font-size: 12px;
-  color: var(--texto-2);
-}
-
-.painel-cabecalho .fechar {
-  margin-left: auto;
-}
-
+/* ---------- Seções da coluna lateral do atendimento ---------- */
 .painel-secao .titulo-secao .texto-fraco {
   text-transform: none;
   letter-spacing: 0;
@@ -650,32 +662,6 @@ body {
   gap: 10px;
   padding: 16px 22px;
   border-bottom: 1px solid var(--borda);
-}
-
-.oportunidade-atual {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 10px;
-}
-
-.oportunidade-atual .dado small {
-  display: block;
-  font-size: 11px;
-  color: var(--texto-3);
-}
-
-.oportunidade-atual .dado strong {
-  font-weight: 500;
-}
-
-.acoes-do-painel {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 8px;
-}
-
-.acoes-do-painel .botao {
-  width: 100%;
 }
 
 .resumo-ia {
@@ -753,9 +739,3 @@ body {
   font-size: 11px;
 }
 
-.oportunidade-fechada {
-  padding: 10px 12px;
-  border-radius: var(--raio);
-  background: var(--superficie-2);
-  font-size: 13px;
-}

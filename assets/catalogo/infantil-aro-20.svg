@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 360" role="img" aria-label="Infantil aro 20">
+  <!-- Imagem ilustrativa do catálogo simulado (demonstração). -->
+  <defs><linearGradient id="f" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#831843"/><stop offset="1" stop-color="#000200"/></linearGradient></defs>
+  <rect width="480" height="360" fill="url(#f)"/>
+  <ellipse cx="240" cy="318" rx="190" ry="10" fill="#000" opacity=".35"/>
+  
+  <g fill="none" stroke="#e5e7eb" stroke-width="7">
+    <circle cx="150" cy="250" r="48"/><circle cx="330" cy="250" r="48"/>
+  </g>
+  <g fill="none" stroke="#9ca3af" stroke-width="2" opacity=".6">
+    <circle cx="150" cy="250" r="38"/><circle cx="330" cy="250" r="38"/>
+  </g>
+  <path d="M150 250 L220 250 L206 146 Z M206 152 L298 144 L220 250" fill="none" stroke="#f472b6" stroke-width="11" stroke-linejoin="round" stroke-linecap="round"/>
+  <path d="M290 122 L330 250" stroke="#f472b6" stroke-width="9" stroke-linecap="round"/>
+  
+  <path d="M272 118 h40" stroke="#e5e7eb" stroke-width="7" stroke-linecap="round"/>
+  <path d="M180 130 h38" stroke="#e5e7eb" stroke-width="9" stroke-linecap="round"/>
+  <circle cx="220" cy="250" r="12" fill="#e5e7eb"/>
+  <text x="24" y="40" font-family="Segoe UI, Arial, sans-serif" font-size="22" font-weight="700" fill="#ffffff">Infantil aro 20</text>
+  <text x="24" y="64" font-family="Segoe UI, Arial, sans-serif" font-size="15" fill="#f472b6">a partir de 6 anos</text>
+</svg>

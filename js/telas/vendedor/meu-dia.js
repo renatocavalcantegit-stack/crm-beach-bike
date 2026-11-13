@@ -5,13 +5,16 @@ import { criar, icone, selo, substituirConteudo } from '../../tela/dom.js';
 
 function seloDoItem(item) {
   if (item.tipo === 'ia') return selo('IA transferiu', { tipo: 'tecnologia', nomeIcone: 'sparkles' });
+  if (item.tipo === 'aguardando') {
+    return selo(item.quantidade > 1 ? `${item.quantidade} sem resposta` : 'Sem resposta', { tipo: 'destaque', nomeIcone: 'message-circle' });
+  }
   if (item.tipo === 'atrasado') return selo('Atrasado', { tipo: 'alerta', nomeIcone: 'alert-circle' });
   if (item.tipo === 'hoje') return selo(`Hoje ${formatarHora(item.momento)}`, { tipo: 'destaque', nomeIcone: 'clock' });
   return selo('Aniversário', { nomeIcone: 'cake' });
 }
 
 function detalheDoItem(item, agora) {
-  if (item.tipo === 'ia') return descreverTempoDecorrido(item.momento, agora);
+  if (item.tipo === 'ia' || item.tipo === 'aguardando') return descreverTempoDecorrido(item.momento, agora);
   if (item.tipo === 'atrasado') return `combinado ${descreverTempoDecorrido(item.momento, agora)}`;
   return '';
 }

@@ -90,11 +90,14 @@ function mostrarErros(formulario, erroGeral, erro) {
 
 let gavetaAberta = null;
 
-/** Abre o painel lateral (só um por vez). Devolve a função que fecha. */
-export function abrirGaveta(conteudo, { aoFechar } = {}) {
+/**
+ * Abre o painel lateral (só um por vez). Devolve a função que fecha.
+ * classe: 'gaveta-larga' para telas de trabalho, como o atendimento.
+ */
+export function abrirGaveta(conteudo, { aoFechar, classe = '' } = {}) {
   fecharGaveta();
   const veu = criar('div', { classe: 'veu', aoClicar: () => fecharGaveta() });
-  const gaveta = criar('aside', { classe: 'gaveta', atributos: { role: 'dialog', 'aria-modal': 'true' } }, [conteudo]);
+  const gaveta = criar('aside', { classe: `gaveta ${classe}`.trim(), atributos: { role: 'dialog', 'aria-modal': 'true' } }, [conteudo]);
 
   function aoTeclar(evento) {
     // Com um modal aberto por cima, o Esc fecha só o modal.

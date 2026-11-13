@@ -22,6 +22,9 @@ function criarRelogio(agora) {
       new Date(base.getFullYear(), base.getMonth(), base.getDate() - dias, hora, 0).toISOString(),
     // Daqui a N horas a partir de agora.
     emHoras: (horas) => new Date(base.getTime() + horas * HORA).toISOString(),
+    // N horas atrás (aceita fração: 1.5 = uma hora e meia). Usado nas conversas,
+    // para a janela de 24 h do WhatsApp ficar sempre igual, a qualquer hora do dia.
+    horasAtras: (horas) => new Date(base.getTime() - horas * HORA).toISOString(),
     // N minutos atrás.
     minutosAtras: (minutos) => new Date(base.getTime() - minutos * 60000).toISOString(),
     // Aniversário que cai hoje para alguém que nasceu no ano informado.
@@ -82,13 +85,13 @@ function criarOportunidades(r) {
       transferidaPelaIaEm: r.minutosAtras(12), transferenciaVista: false,
       resumoIa: 'Quer a Caloi Elite Carbon (R$ 12.990, 2 em estoque). Pediu 10% de desconto à vista no Pix. Já tem uma Sense Impact Pro 2021 e perguntou se pode deixar como parte do pagamento.' }),
     op({ id: 'o02', idCliente: 'c05', idVendedor: 'joao', etapa: 'novo', origem: 'whatsapp',
-      interesse: 'Speed até R$ 6 mil', criadaEm: r.diasAtras(1, 16), ultimoContatoEm: r.diasAtras(1, 16) }),
+      interesse: 'Speed até R$ 6 mil', criadaEm: r.horasAtras(20), ultimoContatoEm: r.horasAtras(20) }),
     op({ id: 'o03', idCliente: 'c06', idVendedor: 'joao', etapa: 'novo', origem: 'loja',
       interesse: 'Infantil aro 20 para a filha', criadaEm: r.hojeAs(9, 20), ultimoContatoEm: r.hojeAs(9, 20) }),
     op({ id: 'o04', idCliente: 'c02', idVendedor: 'joao', etapa: 'atendendo', origem: 'instagram',
       interesse: 'MTB aro 29 com suspensão a ar', criadaEm: r.diasAtras(8), ultimoContatoEm: r.diasAtras(5) }),
     op({ id: 'o05', idCliente: 'c08', idVendedor: 'joao', etapa: 'atendendo', origem: 'whatsapp',
-      interesse: 'Elétrica urbana para ir ao trabalho', criadaEm: r.diasAtras(3), ultimoContatoEm: r.diasAtras(1, 18) }),
+      interesse: 'Elétrica urbana para ir ao trabalho', criadaEm: r.diasAtras(3), ultimoContatoEm: r.horasAtras(21) }),
     op({ id: 'o06', idCliente: 'c03', idVendedor: 'joao', etapa: 'orcamento', origem: 'whatsapp', valor: 4890,
       interesse: 'Sense Impact Pro 2026', criadaEm: r.diasAtras(6), ultimoContatoEm: r.diasAtras(2) }),
     op({ id: 'o07', idCliente: 'c11', idVendedor: 'joao', etapa: 'orcamento', origem: 'instagram', valor: 2350,
@@ -134,7 +137,7 @@ function criarInteracoes(r) {
     { id: 'i02', idCliente: 'c01', idVendedor: null, tipo: 'oficina', descricao: 'Revisão completa na oficina', em: r.diasAtras(72) },
     { id: 'i03', idCliente: 'c02', idVendedor: 'joao', tipo: 'contato', descricao: 'Mandou fotos da Explorer e pediu avaliação na troca', em: r.diasAtras(5) },
     { id: 'i04', idCliente: 'c03', idVendedor: 'joao', tipo: 'etapa', descricao: 'Orçamento de R$ 4.890 enviado pelo WhatsApp', em: r.diasAtras(2) },
-    { id: 'i05', idCliente: 'c08', idVendedor: 'joao', tipo: 'contato', descricao: 'Perguntou autonomia e se cabe no elevador', em: r.diasAtras(1, 18) },
+    { id: 'i05', idCliente: 'c08', idVendedor: 'joao', tipo: 'contato', descricao: 'Perguntou autonomia e se cabe no elevador', em: r.horasAtras(21) },
     { id: 'i06', idCliente: 'c11', idVendedor: 'joao', tipo: 'etapa', descricao: 'Orçamento de R$ 2.350 enviado', em: r.diasAtras(4) },
   ];
 }
@@ -162,19 +165,137 @@ function criarComprasSankhya(r) {
 }
 
 /**
+ * Conversas de WhatsApp e Instagram de cada atendimento aberto.
+ * Atendimento de balcão (o03, o13) não tem conversa.
+ * Cada cenário mostra uma situação da tela de atendimento: transferência da
+ * IA, cliente sem resposta, janela de 24 h fechada, card parado etc.
+ */
+function criarMensagens(r) {
+  let contador = 0;
+  const msg = (idCliente, canal, autor, horasAtras, texto, campos = {}) => ({
+    id: `m${String(++contador).padStart(3, '0')}`,
+    idCliente, canal, autor, texto, foto: null, idModelo: null,
+    idVendedor: autor === 'vendedor' ? 'joao' : null,
+    enviadaEm: r.horasAtras(horasAtras),
+    status: autor === 'vendedor' || autor === 'ia' ? 'lida' : null,
+    ...campos,
+  });
+  const minutos = (quantidade) => quantidade / 60;
+
+  return [
+    // o01 Carla: a IA conversou e transferiu para o João há 12 minutos.
+    msg('c01', 'whatsapp', 'cliente', minutos(17), 'Oi! Vocês têm a Caloi Elite Carbon aro 29?'),
+    msg('c01', 'whatsapp', 'ia', minutos(16), 'Olá, Carla! Temos sim: 2 unidades da Caloi Elite Carbon aro 29, por R$ 12.990. Quer saber mais algum detalhe?'),
+    msg('c01', 'whatsapp', 'cliente', minutos(14), 'Consigo 10% de desconto no Pix? E dá para deixar minha Sense Impact Pro 2021 como parte do pagamento?'),
+    msg('c01', 'whatsapp', 'ia', minutos(13), 'Desconto e avaliação de bike usada são com o nosso time de vendas. Vou te passar para um vendedor agora, tudo bem?'),
+    msg('c01', 'whatsapp', 'cliente', minutos(12.5), 'Pode sim, obrigada!'),
+    msg('c01', 'whatsapp', 'sistema', minutos(12), 'Assistente IA transferiu o atendimento para João Batista'),
+
+    // o02 Marcos: chegou há 20 horas e ninguém respondeu ainda.
+    msg('c05', 'whatsapp', 'cliente', 20, 'Boa noite! Procuro uma speed até uns 6 mil. O que vocês têm?'),
+
+    // o04 Pedro Arruda: janela de 24 h fechada, só dá para mandar modelo aprovado.
+    msg('c02', 'instagram', 'cliente', 122, 'Oi, vi no Instagram a MTB aro 29 com suspensão a ar. Ainda tem?'),
+    msg('c02', 'instagram', 'vendedor', 121, 'Oi, Pedro! Temos sim. Me manda umas fotos da sua Explorer que eu vejo quanto ela vale na troca.'),
+    msg('c02', 'instagram', 'cliente', 120.5, 'Mandei as fotos agora há pouco no direct.'),
+    msg('c02', 'instagram', 'vendedor', 120, 'Recebi! Vou ver com a oficina e te retorno.'),
+
+    // o05 Beatriz: respondida ontem; hoje voltou com outra pergunta.
+    msg('c08', 'whatsapp', 'cliente', 22, 'Qual a autonomia da elétrica urbana? E ela cabe no elevador?'),
+    msg('c08', 'whatsapp', 'vendedor', 21, 'Oi, Beatriz! Faz até 60 km por carga e cabe em pé no elevador. Posso te mandar umas opções?'),
+    msg('c08', 'whatsapp', 'cliente', 3, 'Pode mandar! E vocês fazem test ride?'),
+
+    // o06 Lucas: orçamento enviado há dois dias, o cliente ficou de pensar.
+    msg('c03', 'whatsapp', 'cliente', 52, 'Fala! Quanto fica a Sense Impact Pro 2026?'),
+    msg('c03', 'whatsapp', 'vendedor', 50, 'Lucas, a Sense Impact Pro 2026 fica R$ 4.890. Já sai revisada e com garantia da loja.'),
+    msg('c03', 'whatsapp', 'cliente', 49.5, 'Vou ver com a minha esposa e te falo.'),
+
+    // o07 Diego: orçamento sem resposta há 4 dias (card em alerta).
+    msg('c11', 'instagram', 'cliente', 98, 'Quanto fica o kit Shimano Deore 12v instalado?'),
+    msg('c11', 'instagram', 'vendedor', 97, 'Diego, fica R$ 2.350 com a instalação na nossa oficina.'),
+
+    // o12 (Maria): cliente quer marcar a revisão.
+    msg('c10', 'whatsapp', 'cliente', 26, 'Oi! Queria fazer a revisão e trocar os dois pneus.'),
+    msg('c10', 'whatsapp', 'vendedor', 25, 'Oi, Fernanda! Fazemos sim. Qual dia fica bom para você trazer a bike?', { idVendedor: 'maria' }),
+    msg('c10', 'whatsapp', 'cliente', 1, 'Pode ser sábado de manhã?'),
+
+    // o16 (Pedro): orçamento do Garmin.
+    msg('c09', 'whatsapp', 'cliente', 25, 'Vocês têm o Garmin Edge 540?'),
+    msg('c09', 'whatsapp', 'vendedor', 24.5, 'Temos sim, Thiago! Sai por R$ 1.290.', { idVendedor: 'pedro' }),
+  ];
+}
+
+/** Respostas rápidas: textos que o vendedor manda com um clique. */
+const RESPOSTAS_RAPIDAS = [
+  { id: 'horario', titulo: 'Horário', texto: 'Nosso horário é de segunda a sexta, das 8h às 18h, e sábado, das 8h às 13h.' },
+  // Endereço FICTÍCIO da demonstração: trocar pelo da loja quando o CRM for usado de verdade.
+  { id: 'endereco', titulo: 'Endereço', texto: 'Estamos na Av. da Praia, 1000, Meireles, Fortaleza. Tem estacionamento em frente.' },
+  { id: 'pagamento', titulo: 'Pagamento', texto: 'Aceitamos Pix, dinheiro e cartão de débito ou crédito, com parcelamento no cartão.' },
+  { id: 'test-ride', titulo: 'Test ride', texto: 'Pode vir fazer o test ride, sim! É só trazer um documento com foto. Quer que eu reserve um horário?' },
+  { id: 'revisao', titulo: 'Revisão', texto: 'Fazemos revisão na nossa oficina. A revisão completa leva em média 2 dias úteis. Quer agendar?' },
+];
+
+/**
+ * Modelos aprovados pela Meta: os únicos que podem ser enviados com a janela
+ * de 24 h fechada. {nome} vira o primeiro nome do cliente; {interesse}, o
+ * interesse da oportunidade.
+ */
+const MODELOS = [
+  { id: 'retomar', nome: 'Retomar interesse', texto: 'Olá, {nome}! Aqui é da Beach Bike Store. Você ainda tem interesse em: {interesse}? Posso ajudar com alguma dúvida?' },
+  { id: 'lembrete', nome: 'Lembrete de retorno', texto: 'Olá, {nome}! Passando para lembrar do nosso retorno sobre: {interesse}. Podemos conversar?' },
+  { id: 'chegou', nome: 'Produto chegou', texto: 'Olá, {nome}! Boa notícia: chegou na loja o que você procurava ({interesse}). Quer que a gente reserve para você?' },
+];
+
+/** Catálogo simulado: fotos de produto que o vendedor pode enviar no chat. */
+const CATALOGO = [
+  { id: 'p01', nome: 'Caloi Elite Carbon aro 29', legenda: 'Caloi Elite Carbon aro 29 · R$ 12.990', imagem: 'assets/catalogo/caloi-elite-carbon.svg' },
+  { id: 'p02', nome: 'Sense Impact Pro 2026', legenda: 'Sense Impact Pro 2026 · R$ 4.890', imagem: 'assets/catalogo/sense-impact-pro.svg' },
+  { id: 'p03', nome: 'Oggi Big Wheel 7.2', legenda: 'Oggi Big Wheel 7.2 · R$ 6.990', imagem: 'assets/catalogo/oggi-big-wheel.svg' },
+  { id: 'p04', nome: 'Trek Domane AL 2', legenda: 'Trek Domane AL 2 · R$ 8.990', imagem: 'assets/catalogo/trek-domane.svg' },
+  { id: 'p05', nome: 'Elétrica urbana', legenda: 'Elétrica urbana · até 60 km por carga', imagem: 'assets/catalogo/eletrica-urbana.svg' },
+  { id: 'p06', nome: 'Infantil aro 20', legenda: 'Infantil aro 20 · R$ 1.190', imagem: 'assets/catalogo/infantil-aro-20.svg' },
+];
+
+/** O que o "cliente" simulado responde quando o vendedor manda mensagem (em sequência). */
+export const RESPOSTAS_SIMULADAS_DO_CLIENTE = [
+  'Show! Vou dar uma olhada e te falo 👍',
+  'E qual o prazo para entrega?',
+  'Consigo passar aí amanhã à tarde?',
+  'Perfeito, obrigado!',
+  'Tem em outra cor?',
+  'Ótimo, pode reservar para mim?',
+];
+
+/**
  * Contatos que chegam ao clicar em "Simular contato chegando".
  * Alguns são clientes novos; outros já existem, para mostrar as regras da
  * lista da vez (volta para o mesmo vendedor, IA vai para quem já atendeu).
  */
 export const CONTATOS_SIMULADOS = [
-  { origem: 'whatsapp', nome: 'Vinícius Rolim', telefone: '85984410273', bairro: 'Montese', interesse: 'Bike para começar a pedalar na Beira-Mar' },
-  { origem: 'instagram', nome: 'Camila Nogueira', telefone: '85992218840', bairro: 'Meireles', interesse: 'Viu o reels da Oggi Agile e quer saber o preço' },
+  { origem: 'whatsapp', nome: 'Vinícius Rolim', telefone: '85984410273', bairro: 'Montese', interesse: 'Bike para começar a pedalar na Beira-Mar',
+    conversa: [{ autor: 'cliente', texto: 'Oi! Quero começar a pedalar na Beira-Mar. Qual bike vocês indicam para iniciante?' }] },
+  { origem: 'instagram', nome: 'Camila Nogueira', telefone: '85992218840', bairro: 'Meireles', interesse: 'Viu o reels da Oggi Agile e quer saber o preço',
+    conversa: [{ autor: 'cliente', texto: 'Vi o reels da Oggi Agile! Qual o preço? 😍' }] },
   { origem: 'ia', nome: 'Henrique Pontes', telefone: '85987735519', bairro: 'Cocó', interesse: 'Trek Domane AL 2', valor: 8990,
-    resumoIa: 'Quer a Trek Domane AL 2 (R$ 8.990, 1 em estoque, tamanho 56). Pediu parcelamento em 12x sem juros e desconto.' },
-  { origem: 'whatsapp', idClienteExistente: 'c03', interesse: 'Voltou a perguntar sobre o orçamento da Sense' },
+    resumoIa: 'Quer a Trek Domane AL 2 (R$ 8.990, 1 em estoque, tamanho 56). Pediu parcelamento em 12x sem juros e desconto.',
+    conversa: [
+      { autor: 'cliente', texto: 'Boa noite, tem a Trek Domane AL 2 tamanho 56?' },
+      { autor: 'ia', texto: 'Olá, Henrique! Temos 1 unidade da Trek Domane AL 2 no tamanho 56, por R$ 8.990.' },
+      { autor: 'cliente', texto: 'Dá para fazer em 12x sem juros? Tem algum desconto?' },
+      { autor: 'ia', texto: 'Parcelamento e desconto são com o nosso time de vendas. Vou te transferir agora, um momento!' },
+    ] },
+  { origem: 'whatsapp', idClienteExistente: 'c03', interesse: 'Voltou a perguntar sobre o orçamento da Sense',
+    conversa: [{ autor: 'cliente', texto: 'Oi! Conversei com a minha esposa. Aquele valor da Sense ainda está de pé?' }] },
   { origem: 'ia', idClienteExistente: 'c07', interesse: 'Upgrade para Shimano 105 Di2', valor: 6800,
-    resumoIa: 'Cliente já comprou a Specialized Tarmac. Quer trocar o grupo para Shimano 105 Di2 (R$ 6.800 com instalação) e perguntou se dá para parcelar sem juros.' },
-  { origem: 'instagram', nome: 'Bruna Leitão', telefone: '85995527704', bairro: 'Aldeota', interesse: 'Cadeirinha infantil para bike' },
+    resumoIa: 'Cliente já comprou a Specialized Tarmac. Quer trocar o grupo para Shimano 105 Di2 (R$ 6.800 com instalação) e perguntou se dá para parcelar sem juros.',
+    conversa: [
+      { autor: 'cliente', texto: 'Quero colocar Shimano 105 Di2 na minha Tarmac. Quanto fica?' },
+      { autor: 'ia', texto: 'Olá, Rafael! O grupo Shimano 105 Di2 com instalação na oficina fica R$ 6.800.' },
+      { autor: 'cliente', texto: 'Parcela sem juros?' },
+      { autor: 'ia', texto: 'Quem fecha as condições é o time de vendas. Vou chamar quem já te atendeu!' },
+    ] },
+  { origem: 'instagram', nome: 'Bruna Leitão', telefone: '85995527704', bairro: 'Aldeota', interesse: 'Cadeirinha infantil para bike',
+    conversa: [{ autor: 'cliente', texto: 'Olá! Vocês vendem cadeirinha infantil para bike?' }] },
 ];
 
 /** Monta o conjunto completo de dados de demonstração para "agora". */
@@ -188,6 +309,10 @@ export function criarDadosDeDemonstracao(agora = new Date()) {
     tarefas: criarTarefas(relogio),
     interacoes: criarInteracoes(relogio),
     comprasSankhya: criarComprasSankhya(relogio),
+    mensagens: criarMensagens(relogio),
+    respostasRapidas: RESPOSTAS_RAPIDAS,
+    modelos: MODELOS,
+    catalogo: CATALOGO,
     // Maria chegou primeiro; Pedro está em pausa. João é o 2º da vez.
     fila: {
       data: chaveDoDia(agora),

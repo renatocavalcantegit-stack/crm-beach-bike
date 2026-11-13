@@ -8,7 +8,7 @@ import { formatarMoeda } from '../regras/formatos.js';
 import { validarRetorno, validarValor } from '../regras/validacoes.js';
 import { aguardar, gerarId, gravar, ler } from './armazenamento.js';
 import { registrarInteracao } from './interacoes.js';
-import { concluirTarefasDaOportunidade, criarTarefa } from './tarefas.js';
+import { concluirRetornosAteHoje, concluirTarefasDaOportunidade, criarTarefa } from './tarefas.js';
 
 export async function listarOportunidades() {
   await aguardar();
@@ -144,6 +144,32 @@ export async function registrarContato(idOportunidade, { anotacao, retorno }) {
     });
   }
   return atualizada;
+}
+
+/**
+ * O vendedor respondeu pelo chat: conta como contato (zera o alerta de dias
+ * parado e tira a transferência da IA do topo). Não vai para a linha do tempo,
+ * porque a própria conversa já é o registro.
+ */
+export async function registrarContatoPorMensagem(idOportunidade) {
+  await concluirRetornosAteHoje(idOportunidade);
+  return atualizar(idOportunidade, { ultimoContatoEm: new Date().toISOString(), transferenciaVista: true });
+}
+
+/** Agenda um retorno sem registrar contato (ex.: "ligar sábado para confirmar a visita"). */
+export async function agendarRetorno(idOportunidade, retorno) {
+  if (!retorno?.dataHora) throw new Error('Informe a data e a hora do retorno');
+  const validacao = validarRetorno(retorno, new Date());
+  if (!validacao.valido) throw new Error(validacao.erro);
+
+  const oportunidade = await buscarOportunidade(idOportunidade);
+  return criarTarefa({
+    idOportunidade,
+    idCliente: oportunidade.idCliente,
+    idVendedor: oportunidade.idVendedor,
+    descricao: retorno.descricao.trim(),
+    dataHora: new Date(retorno.dataHora).toISOString(),
+  });
 }
 
 /** O vendedor abriu a transferência da IA: sai do topo do "Meu dia". */

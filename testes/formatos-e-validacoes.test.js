@@ -6,7 +6,6 @@ import {
   descreverTempoDecorrido,
   formatarMoeda,
   formatarTelefone,
-  montarLinkWhatsApp,
   nomeCurto,
   obterIniciais,
 } from '../js/regras/formatos.js';
@@ -28,11 +27,9 @@ test('entende o valor do jeito que o vendedor digita', () => {
   assert.equal(converterTextoEmValor('doze mil'), null);
 });
 
-test('telefone de Fortaleza é formatado e vira link do WhatsApp com 55', () => {
+test('telefone de Fortaleza é formatado', () => {
   assert.equal(formatarTelefone('85988124410'), '(85) 98812-4410');
   assert.equal(formatarTelefone('8532241010'), '(85) 3224-1010');
-  assert.equal(montarLinkWhatsApp('(85) 98812-4410'), 'https://wa.me/5585988124410');
-  assert.equal(montarLinkWhatsApp('85988124410', 'Oi Carla'), 'https://wa.me/5585988124410?text=Oi%20Carla');
 });
 
 test('iniciais e nome curto para os cards', () => {

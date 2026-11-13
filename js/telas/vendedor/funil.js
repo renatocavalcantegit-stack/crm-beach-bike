@@ -1,5 +1,6 @@
 // Quadro "Meu funil": uma coluna por etapa, cards arrastáveis entre colunas.
 
+import { previaDaMensagem, resumirConversa } from '../../regras/conversas.js';
 import { agruparPorEtapa, diasSemContato, ETAPAS, estaParada, foiTransferidaPelaIa, ORIGENS } from '../../regras/funil.js';
 import { descreverDias, formatarMoeda, nomeCurto } from '../../regras/formatos.js';
 import { criar, icone, numero, selo, substituirConteudo } from '../../tela/dom.js';
@@ -19,17 +20,35 @@ function seloDeTempo(oportunidade, agora, diasParaAlerta) {
   return criar('span', { classe: 'texto-fraco', texto: dias === 0 ? 'hoje' : descreverDias(dias) });
 }
 
-function desenharCard(oportunidade, { cliente, agora, diasParaAlerta, aoAbrir }) {
+/** Última mensagem da conversa, para o vendedor saber do que se trata sem abrir. */
+function ultimaMensagem(resumo) {
+  if (!resumo.ultima) return null;
+  const doCliente = resumo.ultima.autor === 'cliente';
+  return criar('span', { classe: `ultima-mensagem ${doCliente ? 'do-cliente' : ''}`.trim() }, [
+    icone(doCliente ? 'message-circle' : 'arrow-back-up'),
+    criar('span', { texto: previaDaMensagem(resumo.ultima, 54) }),
+  ]);
+}
+
+function desenharCard(oportunidade, { cliente, mensagens, agora, diasParaAlerta, aoAbrir }) {
+  const resumo = resumirConversa(mensagens);
   const classes = ['card'];
   if (foiTransferidaPelaIa(oportunidade)) classes.push('da-ia');
   if (estaParada(oportunidade, agora, diasParaAlerta)) classes.push('parado');
+  if (resumo.semResposta > 0) classes.push('sem-resposta');
 
   const card = criar(
     'button',
     { classe: classes.join(' '), atributos: { type: 'button', draggable: 'true' }, dados: { id: oportunidade.id }, aoClicar: () => aoAbrir(oportunidade) },
     [
-      criar('span', { classe: 'nome', texto: nomeCurto(cliente?.nome ?? 'Cliente') }),
+      criar('span', { classe: 'linha-do-nome' }, [
+        criar('span', { classe: 'nome', texto: nomeCurto(cliente?.nome ?? 'Cliente') }),
+        resumo.semResposta > 0
+          ? criar('span', { classe: 'contador-sem-resposta', texto: String(resumo.semResposta), atributos: { title: `${resumo.semResposta} mensagem(ns) sem resposta` } })
+          : null,
+      ]),
       criar('span', { classe: 'interesse', texto: oportunidade.interesse }),
+      ultimaMensagem(resumo),
       oportunidade.valor > 0 ? numero(formatarMoeda(oportunidade.valor), 'valor-do-card') : null,
       criar('div', { classe: 'rodape-do-card' }, [
         criar('span', { classe: 'origem', atributos: { title: `Origem: ${ORIGENS[oportunidade.origem]}` } }, [
@@ -66,7 +85,7 @@ function permitirSoltar(coluna, idEtapa, aoMover) {
   });
 }
 
-export function desenharFunil(elemento, { oportunidades, clientes, agora, diasParaAlerta, aoAbrir, aoMover }) {
+export function desenharFunil(elemento, { oportunidades, clientes, mensagensPorCliente = {}, agora, diasParaAlerta, aoAbrir, aoMover }) {
   const porEtapa = agruparPorEtapa(oportunidades);
 
   const colunas = ETAPAS.map((etapa) => {
@@ -74,7 +93,11 @@ export function desenharFunil(elemento, { oportunidades, clientes, agora, diasPa
     const total = lista.reduce((soma, oportunidade) => soma + (Number(oportunidade.valor) || 0), 0);
     const cards = lista.length
       ? lista.map((oportunidade) =>
-          desenharCard(oportunidade, { cliente: clientes.find((c) => c.id === oportunidade.idCliente), agora, diasParaAlerta, aoAbrir }),
+          desenharCard(oportunidade, {
+            cliente: clientes.find((c) => c.id === oportunidade.idCliente),
+            mensagens: mensagensPorCliente[oportunidade.idCliente] ?? [],
+            agora, diasParaAlerta, aoAbrir,
+          }),
         )
       : [criar('div', { classe: 'coluna-vazia', texto: 'Arraste um card para cá' })];
 

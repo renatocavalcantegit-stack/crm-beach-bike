@@ -9,7 +9,7 @@ import { apagarTudo, gravar, ler } from './armazenamento.js';
 
 // Mude este número quando o formato dos dados mudar: os navegadores que
 // tinham a versão antiga recebem a demonstração nova automaticamente.
-const VERSAO_DOS_DADOS = 1;
+const VERSAO_DOS_DADOS = 2; // 2: conversas, respostas rápidas, modelos e catálogo
 
 function gravarDemonstracao() {
   const dados = criarDadosDeDemonstracao(new Date());

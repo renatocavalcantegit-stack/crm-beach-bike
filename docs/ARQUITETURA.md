@@ -41,7 +41,12 @@ Mesmo assim, ele já está dividido para o back-end entrar depois **sem refazer 
   atraso. A tela já espera respostas como se viessem de um servidor. Para ligar o back-end, troca-se
   o corpo destas funções por chamadas `fetch` à API; as telas não mudam.
 - **Integrações simuladas**: `js/dados/sankhya-simulado.js` imita o ERP; `CONTATOS_SIMULADOS`
-  (em `js/demo/dados-demo.js`) imita mensagens chegando pelo WhatsApp, Instagram e IA.
+  (em `js/demo/dados-demo.js`) imita contatos chegando pelo WhatsApp, Instagram e IA;
+  `js/dados/whatsapp-simulado.js` faz o papel do cliente no chat (a mensagem vira "entregue" e,
+  alguns segundos depois, o cliente lê e responde).
+- **Avisos de mensagem nova**: `js/dados/conversas.js` tem `acompanharConversas(callback)`. A tela se
+  inscreve e é avisada quando chega mensagem ou muda o status. No sistema real, isso vira uma conexão
+  com o servidor (WebSocket ou SSE), alimentada pelo webhook da WhatsApp Business API.
 - **Dados de demonstração** (`js/demo/dados-demo.js`): ficam separados e usam datas relativas a
   "agora", para a demonstração parecer sempre atual.
 
@@ -53,6 +58,17 @@ Mesmo assim, ele já está dividido para o back-end entrar depois **sem refazer 
 4. O modal valida com `validarValor` (`js/regras/validacoes.js`) e chama `moverParaEtapa` (`js/dados/oportunidades.js`).
 5. A camada de dados confere a regra de novo, grava e registra na linha do tempo.
 6. A tela inteira é redesenhada com os dados novos (`atualizarTela`).
+
+## Caminho de uma mensagem (vendedor responde no chat)
+
+1. `js/telas/vendedor/atendimento-conversa.js` desenha a caixa de escrever; Enter chama `enviarRascunho`.
+2. `js/telas/vendedor/atendimento.js` chama `enviarMensagem` (`js/dados/conversas.js`).
+3. A camada de dados valida (`validarMensagem`), confere a janela de 24 h (`verificarEnvioLivre`,
+   em `js/regras/conversas.js`), grava a mensagem e registra o contato na oportunidade
+   (`registrarContatoPorMensagem`).
+4. Quem está inscrito em `acompanharConversas` é avisado: o atendimento redesenha **só a conversa**
+   (o rascunho fica) e a mesa atualiza o card e o "Meu dia".
+5. A simulação do cliente marca a mensagem como entregue, depois lida, e grava a resposta.
 
 ## Segurança na tela
 

@@ -36,3 +36,6 @@ Use a cada entrega. Cada item tem como conferir.
 - [ ] Abre sem erros no console (F12 → Console).
 - [ ] Tema escuro e claro legíveis; a escolha continua após recarregar.
 - [ ] "Restaurar dados" volta a demonstração ao estado original.
+- [ ] Atendimento: mandar mensagem, ver "entregue" e a resposta simulada chegar; com a janela de 24 h
+      fechada (ex.: Pedro A.), só aparecem os modelos aprovados; balcão (ex.: Júlia P.) não tem conversa.
+- [ ] O rascunho da mensagem não se perde quando chega mensagem nova.

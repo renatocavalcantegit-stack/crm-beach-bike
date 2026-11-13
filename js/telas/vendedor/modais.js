@@ -2,12 +2,14 @@
 // Cada um valida com as regras de js/regras/ e grava pela camada de dados.
 
 import { receberContato } from '../../dados/atendimentos.js';
-import { marcarComoGanha, marcarComoPerdida, moverParaEtapa, registrarContato } from '../../dados/oportunidades.js';
+import { enviarFoto } from '../../dados/conversas.js';
+import { agendarRetorno, marcarComoGanha, marcarComoPerdida, moverParaEtapa, registrarContato } from '../../dados/oportunidades.js';
 import { buscarEtapa, MOTIVOS_DE_PERDA } from '../../regras/funil.js';
 import { formatarMoeda } from '../../regras/formatos.js';
 import { validarNovoAtendimento, validarRetorno, validarValor } from '../../regras/validacoes.js';
 import { abrirModal, ErroDeFormulario } from '../../tela/camadas.js';
 import { campoDeTexto, campoDeTextoLongo, grupoDeOpcoes } from '../../tela/campos.js';
+import { criar } from '../../tela/dom.js';
 
 const valorParaCampo = (valor) => (valor > 0 ? String(valor).replace('.', ',') : '');
 
@@ -72,6 +74,54 @@ export function abrirRegistroDeContato(oportunidade) {
         throw new ErroDeFormulario({ [campo]: validacao.erro });
       }
       await registrarContato(oportunidade.id, { anotacao, retorno: dataHora ? retorno : null });
+    },
+  });
+}
+
+/** Agenda o próximo retorno sem registrar contato. */
+export function abrirAgendamentoDeRetorno(oportunidade) {
+  return abrirModal({
+    titulo: 'Agendar retorno',
+    subtitulo: `${oportunidade.interesse}. O retorno aparece no seu "Meu dia" na data marcada.`,
+    campos: [
+      campoDeTexto({ nome: 'dataHora', rotulo: 'Quando', tipo: 'datetime-local' }),
+      campoDeTexto({ nome: 'descricao', rotulo: 'O que fazer', placeholder: 'Ligar para confirmar o test ride' }),
+    ],
+    textoConfirmar: 'Agendar',
+    aoConfirmar: async ({ dataHora, descricao }) => {
+      if (!dataHora) throw new ErroDeFormulario({ dataHora: 'Informe a data e a hora' });
+      const validacao = validarRetorno({ dataHora, descricao }, new Date());
+      if (!validacao.valido) {
+        const campo = String(validacao.erro).includes('fazer') ? 'descricao' : 'dataHora';
+        throw new ErroDeFormulario({ [campo]: validacao.erro });
+      }
+      await agendarRetorno(oportunidade.id, { dataHora, descricao });
+    },
+  });
+}
+
+/** Escolher uma foto do catálogo para mandar no chat. */
+export function escolherFotoDoCatalogo(oportunidade, catalogo) {
+  const opcoes = catalogo.map((produto) =>
+    criar('label', { classe: 'opcao-de-foto' }, [
+      criar('input', { atributos: { type: 'radio', name: 'idProduto', value: produto.id } }),
+      criar('img', { atributos: { src: produto.imagem, alt: '', loading: 'lazy' } }),
+      criar('span', { texto: produto.legenda }),
+    ]),
+  );
+  return abrirModal({
+    titulo: 'Enviar foto do catálogo',
+    subtitulo: 'A foto vai com a legenda do produto.',
+    campos: [
+      criar('div', { classe: 'campo' }, [
+        criar('div', { classe: 'grade-de-fotos', atributos: { role: 'radiogroup', 'aria-label': 'Produtos' } }, opcoes),
+        criar('span', { classe: 'erro-do-campo' }),
+      ]),
+    ],
+    textoConfirmar: 'Enviar foto',
+    aoConfirmar: async ({ idProduto }) => {
+      if (!idProduto) throw new ErroDeFormulario({ idProduto: 'Escolha uma foto' });
+      await enviarFoto(oportunidade.id, idProduto);
     },
   });
 }

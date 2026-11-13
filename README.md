@@ -11,10 +11,13 @@ Serve para clicar, testar o fluxo completo e validar as regras com quem vai usar
 
 - Ver a **lista da vez** (quem recebe o próximo contato) e entrar/sair de pausa.
 - Acompanhar a **meta do mês**, oportunidades abertas, retornos e transferências da IA.
-- Trabalhar o **Meu dia**: transferências da IA, retornos atrasados, retornos de hoje e aniversariantes.
+- Trabalhar o **Meu dia**: transferências da IA, clientes sem resposta, retornos atrasados, retornos de hoje e aniversariantes.
 - Arrastar os cards do **funil** (Novo → Atendendo → Orçamento → Negociação).
-- Abrir o **painel do cliente**: bicicletas, compras no Sankhya, resumo da IA, linha do tempo,
-  conversar no WhatsApp, registrar contato, marcar como ganho ou perdido.
+- **Atender pelo próprio CRM** (WhatsApp e Instagram na mesma caixa, sem sair da tela): conversar,
+  usar respostas rápidas, enviar fotos do catálogo e, com a janela de 24 h fechada, modelos aprovados.
+  O cliente simulado responde alguns segundos depois.
+- Na mesma tela de atendimento: trocar a etapa, marcar ganho ou perdido, registrar contato por
+  ligação ou na loja, agendar retorno e ver resumo da IA, bicicletas, compras no Sankhya e linha do tempo.
 - Registrar um **novo atendimento** de cliente que chegou na loja.
 - Alternar entre **tema escuro e claro** (a escolha fica salva).
 - No **modo demonstração**: trocar de vendedor ("ver como"), simular contatos chegando e restaurar os dados.
@@ -58,13 +61,14 @@ git push     # ao terminar
 
 ```
 index.html                 tela do vendedor
-css/                       tokens.css (cores da marca e temas), base.css, componentes.css, vendedor.css
+css/                       tokens.css (cores da marca e temas), base.css, componentes.css, vendedor.css, atendimento.css
 js/regras/                 regras de negócio PURAS, com teste (o servidor vai reaproveitar)
 js/dados/                  camada de dados: única que lê/grava o armazenamento (vira chamada de API)
 js/demo/dados-demo.js      dados de demonstração fictícios
 js/tela/                   utilitários de tela compartilhados (montar elementos, modal, avisos, tema)
 js/telas/vendedor.js       coordena a tela do vendedor
-js/telas/vendedor/         cada parte da tela (faixa da vez, indicadores, meu dia, funil, painel)
+js/telas/vendedor/         cada parte da tela (faixa da vez, indicadores, meu dia, funil, atendimento)
+assets/catalogo/           fotos ilustrativas do catálogo simulado
 testes/                    testes automatizados (node --test)
 scripts/servidor.js        servidor local mínimo
 docs/                      documentação de apoio

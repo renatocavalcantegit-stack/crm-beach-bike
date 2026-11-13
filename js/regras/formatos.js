@@ -59,16 +59,6 @@ export function formatarTelefone(telefone) {
   return String(telefone ?? '');
 }
 
-/**
- * Link que abre a conversa no WhatsApp (wa.me).
- * O número precisa do código do país (55) na frente do DDD.
- */
-export function montarLinkWhatsApp(telefone, mensagem = '') {
-  const numero = '55' + somenteDigitos(telefone);
-  const texto = mensagem ? `?text=${encodeURIComponent(mensagem)}` : '';
-  return `https://wa.me/${numero}${texto}`;
-}
-
 /** "Carla Menezes" → "CM"; "Ana" → "AN". Usado nos avatares. */
 export function obterIniciais(nome) {
   const partes = String(nome ?? '').trim().split(/\s+/).filter(Boolean);
@@ -114,6 +104,24 @@ export function descreverTempoDecorrido(desde, agora) {
   if (dias === 0) return `há ${Math.floor(minutos / 60)} h`;
   if (dias === 1) return 'ontem';
   return `há ${dias} dias`;
+}
+
+/** Separador de dia na conversa: "Hoje", "Ontem" ou "10/11". */
+export function descreverDiaDaConversa(dia, agora) {
+  const dias = diasEntre(dia, agora);
+  if (dias === 0) return 'Hoje';
+  if (dias === 1) return 'Ontem';
+  return formatarDiaMes(dia);
+}
+
+/** Tempo que falta, para a janela de 24 h: "3 h 12 min", "45 min", "menos de 1 min". */
+export function descreverTempoRestante(milissegundos) {
+  const minutos = Math.floor(milissegundos / 60000);
+  if (minutos < 1) return 'menos de 1 min';
+  if (minutos < 60) return `${minutos} min`;
+  const horas = Math.floor(minutos / 60);
+  const resto = minutos % 60;
+  return resto ? `${horas} h ${resto} min` : `${horas} h`;
 }
 
 /** "1 dia", "5 dias" — usado no alerta de tempo parado. */

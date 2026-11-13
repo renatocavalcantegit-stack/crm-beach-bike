@@ -6,6 +6,7 @@
 
 import { receberContato } from '../dados/atendimentos.js';
 import { listarClientes } from '../dados/clientes.js';
+import { acompanharConversas, listarMensagensPorCliente } from '../dados/conversas.js';
 import * as fila from '../dados/fila.js';
 import { garantirDadosIniciais, restaurarDemonstracao } from '../dados/inicializacao.js';
 import { buscarOportunidade, listarOportunidades, moverParaEtapa } from '../dados/oportunidades.js';
@@ -16,6 +17,7 @@ import { listarVendedores } from '../dados/vendedores.js';
 import { CONTATOS_SIMULADOS } from '../demo/dados-demo.js';
 import { explicarMotivo } from '../regras/distribuicao.js';
 import { DIAS_PARA_ALERTA_PADRAO, estaAberta, verificarMudancaDeEtapa } from '../regras/funil.js';
+import { previaDaMensagem } from '../regras/conversas.js';
 import { nomeCurto } from '../regras/formatos.js';
 import { calcularIndicadores } from '../regras/metas.js';
 import { montarMeuDia } from '../regras/meu-dia.js';
@@ -27,7 +29,7 @@ import { desenharFunil } from './vendedor/funil.js';
 import { desenharIndicadores } from './vendedor/indicadores.js';
 import { desenharMeuDia } from './vendedor/meu-dia.js';
 import { abrirNovoAtendimento, perguntarValorEMover } from './vendedor/modais.js';
-import { abrirPainelDoCliente } from './vendedor/painel-cliente.js';
+import { abrirAtendimento, idClienteDoAtendimentoAberto } from './vendedor/atendimento.js';
 import { desenharSaudacao, desenharSincronizacao, desenharUsuario, ligarBusca } from './vendedor/topo.js';
 
 const elementos = {
@@ -43,19 +45,22 @@ const elementos = {
 
 // Próximo contato simulado (circula pela lista de CONTATOS_SIMULADOS).
 let indiceDoProximoContato = 0;
+// Enquanto um contato simulado chega, o aviso é o da distribuição, não o de "mensagem nova".
+let recebendoContato = false;
 
 async function carregarDados() {
-  const [vendedores, clientes, oportunidades, tarefas, filaDoDia, ultimaSincronizacao] = await Promise.all([
+  const [vendedores, clientes, oportunidades, tarefas, filaDoDia, ultimaSincronizacao, mensagensPorCliente] = await Promise.all([
     listarVendedores(),
     listarClientes(),
     listarOportunidades(),
     listarTarefas(),
     fila.obterFilaDoDia(),
     obterUltimaSincronizacao(),
+    listarMensagensPorCliente(),
   ]);
   const idVendedorAtual = obterIdVendedorAtual();
   const vendedor = vendedores.find((v) => v.id === idVendedorAtual) ?? vendedores[0];
-  return { vendedores, clientes, oportunidades, tarefas, filaDoDia, ultimaSincronizacao, vendedor };
+  return { vendedores, clientes, oportunidades, tarefas, filaDoDia, ultimaSincronizacao, mensagensPorCliente, vendedor };
 }
 
 /** Redesenha a tela inteira. Simples e previsível: toda ação termina aqui. */
@@ -87,6 +92,7 @@ async function atualizarTela() {
   desenharFunil(elementos.funil, {
     oportunidades: dados.oportunidades.filter((o) => o.idVendedor === vendedor.id && estaAberta(o)),
     clientes: dados.clientes,
+    mensagensPorCliente: dados.mensagensPorCliente,
     agora,
     diasParaAlerta: DIAS_PARA_ALERTA_PADRAO,
     aoAbrir: (oportunidade) => abrirCliente(oportunidade.idCliente, oportunidade.id),
@@ -106,7 +112,35 @@ async function atualizarTela() {
 }
 
 function abrirCliente(idCliente, idOportunidade = null) {
-  return abrirPainelDoCliente({ idCliente, idOportunidade, aoMudar: atualizarTela }).catch(mostrarErro);
+  return abrirAtendimento({
+    idCliente,
+    idOportunidade,
+    idVendedorAtual: obterIdVendedorAtual(),
+    aoMudar: atualizarTela,
+    aoMudarEtapa: moverCard,
+  }).catch(mostrarErro);
+}
+
+/**
+ * Cliente mandou mensagem: atualiza a mesa (contador no card, "Meu dia") e,
+ * se o atendimento dele não está aberto na tela, avisa o vendedor.
+ */
+let atualizacaoPendente = null;
+function atualizarEmSeguida() {
+  clearTimeout(atualizacaoPendente);
+  atualizacaoPendente = setTimeout(() => atualizarTela().catch(mostrarErro), 150);
+}
+
+async function aoChegarMensagem({ tipo, mensagem }) {
+  if (tipo !== 'nova' || mensagem.autor !== 'cliente' || recebendoContato) return;
+  atualizarEmSeguida();
+  if (idClienteDoAtendimentoAberto() === mensagem.idCliente) return;
+
+  const oportunidades = await listarOportunidades();
+  const minha = oportunidades.find((o) => o.idCliente === mensagem.idCliente && estaAberta(o) && o.idVendedor === obterIdVendedorAtual());
+  if (!minha) return; // conversa de outro vendedor: só ele é avisado
+  const cliente = (await listarClientes()).find((c) => c.id === mensagem.idCliente);
+  mostrarAviso({ titulo: `${nomeCurto(cliente?.nome ?? 'Cliente')} respondeu`, texto: previaDaMensagem(mensagem, 80), nomeIcone: 'message-circle' });
 }
 
 async function moverCard(idOportunidade, idEtapa) {
@@ -154,12 +188,15 @@ async function avisarSobreDistribuicao({ cliente, oportunidade, decisao }) {
 async function simularContato() {
   const contato = CONTATOS_SIMULADOS[indiceDoProximoContato % CONTATOS_SIMULADOS.length];
   indiceDoProximoContato += 1;
+  recebendoContato = true;
   try {
     const resultado = await receberContato(contato);
     await atualizarTela();
     await avisarSobreDistribuicao(resultado);
   } catch (erro) {
     mostrarErro(erro);
+  } finally {
+    recebendoContato = false;
   }
 }
 
@@ -187,6 +224,7 @@ async function iniciar() {
     aoEscolherCliente: (cliente) => abrirCliente(cliente.id),
   });
   document.getElementById('botao-novo-atendimento').addEventListener('click', () => novoAtendimento().catch(mostrarErro));
+  acompanharConversas((evento) => aoChegarMensagem(evento).catch(mostrarErro));
   await atualizarTela();
   document.documentElement.classList.remove('iniciando');
 
