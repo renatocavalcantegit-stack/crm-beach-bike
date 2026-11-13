@@ -67,6 +67,8 @@ tela de atendimento. O cliente continua no WhatsApp (ou Instagram) dele; no sist
 5. **Fotos do catálogo:** o vendedor envia fotos de produto com legenda (catálogo simulado).
 6. **Mensagem sem resposta** = mensagem do cliente que chegou depois da última resposta da loja
    (vendedor ou IA). Avisos internos do sistema não contam como resposta.
+   Vale para **qualquer** última mensagem do cliente, até um "vou pensar e te falo": o vendedor
+   sempre fecha a conversa respondendo (confirmado com a loja em 13/11/2026).
 7. **Cada vendedor vê só as conversas dele**; o gerente verá todas (quando existir a tela do gerente).
    Abrindo pela busca um cliente de outro vendedor, a conversa aparece bloqueada.
 8. **Atendimento de balcão não abre conversa** por enquanto: a tela mostra "Atendimento presencial"
